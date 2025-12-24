@@ -14,7 +14,7 @@ function getPlateThickness(weight: number): number {
     case 25:
       return 16;
     case 10:
-      return 12;
+      return 10;
     case 5:
     case 2.5:
       return 6; // small plates same thickness

@@ -4,6 +4,7 @@ interface WeightInputProps {
   actualWeight: number;
   difference: number;
   maxWeight?: number;
+  hasPlates?: boolean;
 }
 
 export function WeightInput({
@@ -12,6 +13,7 @@ export function WeightInput({
   actualWeight,
   difference,
   maxWeight = 1500,
+  hasPlates = false,
 }: WeightInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -45,7 +47,7 @@ export function WeightInput({
         />
       </div>
 
-      {targetWeight && (
+      {(targetWeight || hasPlates) && (
         <div className="bg-white rounded-lg p-4 shadow-sm space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Actual Weight:</span>
@@ -53,14 +55,18 @@ export function WeightInput({
               {actualWeight} lbs
             </span>
           </div>
-          {difference !== 0 && (
+          {targetWeight && (
             <div className="text-sm text-gray-500 pt-2 border-t">
-              {difference > 0 ? (
+              {difference === 0 ? (
+                <span className="text-green-600">Exact match!</span>
+              ) : difference > 0 ? (
                 <span className="text-amber-600">
                   {difference.toFixed(1)} lbs under target
                 </span>
               ) : (
-                <span className="text-green-600">Exact match!</span>
+                <span className="text-blue-600">
+                  {Math.abs(difference).toFixed(1)} lbs over target
+                </span>
               )}
             </div>
           )}

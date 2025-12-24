@@ -36,6 +36,12 @@ function App() {
     setManualPlates(newPlates);
   };
 
+  // Reset everything
+  const handleReset = () => {
+    setTargetWeight('');
+    setManualPlates([]);
+  };
+
   // Calculate actual weight and difference
   const actualWeight = manualPlates.length > 0 ? calculateWeightFromPlates(manualPlates) : 45;
   const targetWeightNum = parseFloat(targetWeight) || 0;
@@ -62,23 +68,34 @@ function App() {
             actualWeight={actualWeight}
             difference={difference}
             maxWeight={MAX_WEIGHT}
+            hasPlates={manualPlates.length > 0}
           />
         </div>
 
         {/* Barbell Visualization */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <BarbellVisualizer platesPerSide={manualPlates} />
+          
+          {/* Reset Button */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={handleReset}
+              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-sm"
+            >
+              Reset
+            </button>
+          </div>
         </div>
 
         {/* Manual Plate Controls */}
-        <PlateControls plates={manualPlates} onPlateChange={handlePlateChange} />
+        <PlateControls 
+          plates={manualPlates} 
+          onPlateChange={handlePlateChange}
+        />
 
         {/* Info footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Standard barbell weight: 45 lbs</p>
-          <p className="mt-1">
-            Available plates: 45, 35, 25, 10, 5, and 2.5 lbs
-          </p>
+          <p>Made with love in Brooklyn, NY. 💪🏾❤️</p>
         </div>
       </div>
     </div>
