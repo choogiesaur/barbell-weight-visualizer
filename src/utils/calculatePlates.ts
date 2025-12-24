@@ -12,6 +12,7 @@ export interface PlateCalculation {
 
 const BARBELL_WEIGHT = 45;
 const AVAILABLE_PLATES = [45, 35, 25, 10, 5, 2.5];
+export const MAX_WEIGHT = 1500;
 
 /**
  * Calculates the optimal plate configuration for a target weight
@@ -100,5 +101,17 @@ export function getPlateSize(weight: number): number {
     default:
       return 50;
   }
+}
+
+/**
+ * Calculates total weight from a given plate configuration
+ * Used when manually adjusting plates
+ */
+export function calculateWeightFromPlates(platesPerSide: PlateCount[]): number {
+  const weightFromPlates = platesPerSide.reduce(
+    (sum, plate) => sum + plate.weight * plate.count * 2, // multiply by 2 for both sides
+    0
+  );
+  return BARBELL_WEIGHT + weightFromPlates;
 }
 

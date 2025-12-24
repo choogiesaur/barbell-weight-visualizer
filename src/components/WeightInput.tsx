@@ -3,6 +3,7 @@ interface WeightInputProps {
   onWeightChange: (weight: string) => void;
   actualWeight: number;
   difference: number;
+  maxWeight?: number;
 }
 
 export function WeightInput({
@@ -10,11 +11,17 @@ export function WeightInput({
   onWeightChange,
   actualWeight,
   difference,
+  maxWeight = 1500,
 }: WeightInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // Allow empty string or valid numbers
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      const numValue = parseFloat(value);
+      // Check if value exceeds max weight
+      if (value !== '' && numValue > maxWeight) {
+        return; // Don't update if over limit
+      }
       onWeightChange(value);
     }
   };
@@ -26,7 +33,7 @@ export function WeightInput({
           htmlFor="weight-input"
           className="block text-sm font-medium text-gray-700 mb-2"
         >
-          Target Weight (lbs)
+          Target Weight (lbs) <span className="text-gray-500 font-normal">- Max: {maxWeight} lbs</span>
         </label>
         <input
           id="weight-input"

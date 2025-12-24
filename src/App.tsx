@@ -1,24 +1,45 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { WeightInput } from './components/WeightInput';
 import { BarbellVisualizer } from './components/BarbellVisualizer';
-import { calculatePlates } from './utils/calculatePlates';
+import { PlateControls } from './components/PlateControls';
+import { calculatePlates, calculateWeightFromPlates, MAX_WEIGHT } from './utils/calculatePlates';
+import type { PlateCount } from './utils/calculatePlates';
 
 function App() {
   const [targetWeight, setTargetWeight] = useState<string>('');
+  const [manualPlates, setManualPlates] = useState<PlateCount[]>([]);
 
-  // Calculate plates based on input
-  const calculation = useMemo(() => {
+  // Calculate plates when target weight changes
+  const calculatedPlates = useMemo(() => {
     const weight = parseFloat(targetWeight);
     if (isNaN(weight) || weight <= 0) {
-      return {
-        platesPerSide: [],
-        totalWeight: 45,
-        targetWeight: 0,
-        difference: 0,
-      };
+      return [];
     }
-    return calculatePlates(weight);
+    return calculatePlates(weight).platesPerSide;
   }, [targetWeight]);
+
+  // When target weight changes, override manual plates with calculation
+  useEffect(() => {
+    if (targetWeight) {
+      setManualPlates(calculatedPlates);
+    }
+  }, [targetWeight, calculatedPlates]);
+
+  // Handle target weight input changes
+  const handleWeightChange = (weight: string) => {
+    setTargetWeight(weight);
+    // calculatedPlates will update via useMemo, then useEffect will update manualPlates
+  };
+
+  // Handle manual plate adjustments
+  const handlePlateChange = (newPlates: PlateCount[]) => {
+    setManualPlates(newPlates);
+  };
+
+  // Calculate actual weight and difference
+  const actualWeight = manualPlates.length > 0 ? calculateWeightFromPlates(manualPlates) : 45;
+  const targetWeightNum = parseFloat(targetWeight) || 0;
+  const difference = targetWeightNum - actualWeight;
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">
@@ -37,16 +58,20 @@ function App() {
         <div className="mb-12">
           <WeightInput
             targetWeight={targetWeight}
-            onWeightChange={setTargetWeight}
-            actualWeight={calculation.totalWeight}
-            difference={calculation.difference}
+            onWeightChange={handleWeightChange}
+            actualWeight={actualWeight}
+            difference={difference}
+            maxWeight={MAX_WEIGHT}
           />
         </div>
 
         {/* Barbell Visualization */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <BarbellVisualizer platesPerSide={calculation.platesPerSide} />
+          <BarbellVisualizer platesPerSide={manualPlates} />
         </div>
+
+        {/* Manual Plate Controls */}
+        <PlateControls plates={manualPlates} onPlateChange={handlePlateChange} />
 
         {/* Info footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
